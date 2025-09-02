@@ -1,0 +1,89 @@
+/* Base theme */
+:root{--gold:#ffd166;--bg1:#b2070b;--bg2:#6c0404;--text:#111827}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,'Noto Sans Thai',sans-serif;color:#fff;
+background:radial-gradient(circle at 50% 40%, rgba(255,255,255,.07), rgba(255,255,255,0) 36%),
+repeating-conic-gradient(from 0deg, rgba(255,255,255,.08) 0 10deg, rgba(0,0,0,0) 10deg 20deg),
+radial-gradient(circle at 50% 40%, var(--bg1) 0%, #8d0606 60%, var(--bg2) 100%);
+background-blend-mode: screen, soft-light, normal; min-height:100vh; display:flex; flex-direction:column}
+
+
+.header{display:flex;gap:.75rem;align-items:center;justify-content:space-between;padding:1rem 1.25rem}
+.title{background:#fff;color:var(--text);padding:.5rem 1rem;border-radius:14px;font-weight:900;box-shadow:0 6px 16px rgba(0,0,0,.2)}
+.nav{display:flex;gap:.5rem;flex-wrap:wrap}
+
+
+button{cursor:pointer;border-radius:10px;border:1px solid transparent;padding:.6rem 1rem;font-weight:700}
+.btn{transition:transform .06s ease, box-shadow .2s} .btn:active{transform:translateY(1px)}
+.btn-primary{background:#fff;color:#7a0303}
+.btn-ghost{background:transparent;border-color:#ffffff40;color:#fff}
+.solid-gold{background:var(--gold);color:#111}
+
+
+main{flex:1;padding:0 1.25rem 2rem}
+.center{display:grid;place-items:center}
+.stack{display:grid;gap:1rem}
+.grid-gap{display:grid;gap:.5rem}
+.stage{max-width:1100px;width:100%}
+.digits{display:flex;justify-content:center;gap:min(2vw,18px);flex-wrap:wrap}
+.digit{width:clamp(60px,9vw,110px);height:clamp(86px,14vw,140px);background:#fff;color:var(--text);border-radius:16px;display:grid;place-items:center;font-weight:900;font-size:clamp(36px,7vw,80px);box-shadow:0 10px 22px rgba(0,0,0,.25), inset 0 -4px 0 #f2f2f2;border:4px solid #f6e1a2}
+.digit.locked{outline:3px solid var(--gold);box-shadow:0 0 0 3px rgba(255,209,102,.35),0 10px 22px rgba(0,0,0,.25)}
+
+
+.row{display:flex;gap:.5rem;align-items:center;justify-content:center;flex-wrap:wrap}
+.end{justify-content:flex-end}
+.mt{margin-top:1rem}
+.bold{font-weight:900}
+.gold{color:var(--gold)}
+.muted{opacity:.85}
+.small{font-size:.9rem}
+
+
+.select{min-width:280px;background:#fff;font-weight:700;color:var(--text);padding:.55rem .75rem;border-radius:10px;border:1px solid #e5e7eb}
+.fsPrize{text-align:center;font-size:1.25rem;font-weight:700}
+.remain{font-size:.95rem}
+.drawLine{text-align:center;font-size:1.25rem}
+
+
+.panel{background:rgba(255,255,255,.1);border-radius:16px;padding:1rem}
+.winnersBox{max-width:900px;margin:0 auto}
+.registerBox{max-width:1100px;margin:0 auto}
+.tabRow{display:flex;gap:.5rem;margin-bottom:.8rem}
+.addBox{display:grid;gap:.8rem}
+.addGrid{display:grid;grid-template-columns:160px 1fr auto;gap:.6rem;align-items:center}
+.toolsRow{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center}
+.searchRow{display:flex;gap:.5rem;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.search{max-width:360px;width:100%}
+
+
+.table{width:100%;border-collapse:collapse;overflow:hidden;border-radius:12px}
+.table thead th{background:rgba(255,255,255,.2);text-align:left;padding:.5rem}
+.table tbody td{padding:.5rem;border-top:1px solid rgba(255,255,255,.15)}
+.centerCell{text-align:center}
+
+
+.list{max-height:45vh;overflow:auto}
+
+
+/* modal */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;z-index:50}
+.modal-bg.show{display:flex}
+.modal{background:#7a0202;color:#fff;width:min(92vw,900px);border-radius:16px;padding:1rem}
+.modalTitle{margin:0;font-size:1.1rem;font-weight:800}
+
+
+/* fullscreen */
+.fs-mode .hide-in-fs{display:none !important}
+.fs-mode .show-in-fs{display:block !important}
+.show-in-fs{display:none}
+.fs-mode main{padding:0}
+.fs-mode #digitsRow{gap:clamp(10px,2.5vw,28px)}
+.fs-mode .digit{width:clamp(110px,14vw,220px);height:clamp(150px,20vw,260px);font-size:clamp(72px,12vw,180px);border-width:6px}
+.fs-mode #fsPrizeRemain{display:none}
+.fs-mode .modal-bg{display:none!important}
+
+
+.hidden{display:none !important}
+.flex1{flex:1;min-width:220px}
+.numSmall{width:90px}
