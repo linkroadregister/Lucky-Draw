@@ -3,10 +3,10 @@
 *{box-sizing:border-box}
 html,body{height:100%}
 body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,'Noto Sans Thai',sans-serif;color:#fff;
-background:radial-gradient(circle at 50% 40%, rgba(255,255,255,.07), rgba(255,255,255,0) 36%),
-repeating-conic-gradient(from 0deg, rgba(255,255,255,.08) 0 10deg, rgba(0,0,0,0) 10deg 20deg),
-radial-gradient(circle at 50% 40%, var(--bg1) 0%, #8d0606 60%, var(--bg2) 100%);
-background-blend-mode: screen, soft-light, normal; min-height:100vh; display:flex; flex-direction:column}
+ background:radial-gradient(circle at 50% 40%, rgba(255,255,255,.07), rgba(255,255,255,0) 36%),
+ repeating-conic-gradient(from 0deg, rgba(255,255,255,.08) 0 10deg, rgba(0,0,0,0) 10deg 20deg),
+ radial-gradient(circle at 50% 40%, var(--bg1) 0%, #8d0606 60%, var(--bg2) 100%);
+ background-blend-mode: screen, soft-light, normal; min-height:100vh; display:flex; flex-direction:column}
 
 .header{display:flex;gap:.75rem;align-items:center;justify-content:space-between;padding:1rem 1.25rem}
 .title{background:#fff;color:var(--text);padding:.5rem 1rem;border-radius:14px;font-weight:900;box-shadow:0 6px 16px rgba(0,0,0,.2)}
@@ -63,12 +63,21 @@ main{flex:1;padding:0 1.25rem 2rem}
 .modal{background:#7a0202;color:#fff;width:min(92vw,900px);border-radius:16px;padding:1rem}
 .modalTitle{margin:0;font-size:1.1rem;font-weight:800}
 
-/* fullscreen (เดิม) */
+/* fullscreen core */
 .fs-mode .hide-in-fs{display:none !important}
 .fs-mode .show-in-fs{display:block !important}
 .show-in-fs{display:none}
 .fs-mode main{padding:0}
-.fs-mode #digitsRow{gap:clamp(10px,2.5vw,28px)}
+
+/* CENTERED FULLSCREEN + SAME BACKGROUND */
+.fs-mode .stage{
+  min-height:100dvh;width:100vw;display:grid;place-items:center;align-content:center;margin:0;padding:0;
+  background:radial-gradient(circle at 50% 40%, rgba(255,255,255,.07), rgba(255,255,255,0) 36%),
+             repeating-conic-gradient(from 0deg, rgba(255,255,255,.08) 0 10deg, rgba(0,0,0,0) 10deg 20deg),
+             radial-gradient(circle at 50% 40%, var(--bg1) 0%, #8d0606 60%, var(--bg2) 100%);
+  background-blend-mode: screen, soft-light, normal;
+}
+.fs-mode #digitsRow{gap:clamp(10px,2.5vw,28px);margin:0 auto}
 .fs-mode .digit{width:clamp(110px,14vw,220px);height:clamp(150px,20vw,260px);font-size:clamp(72px,12vw,180px);border-width:6px}
 .fs-mode #fsPrizeRemain{display:none}
 .fs-mode .modal-bg{display:none!important}
@@ -76,22 +85,3 @@ main{flex:1;padding:0 1.25rem 2rem}
 .hidden{display:none !important}
 .flex1{flex:1;min-width:220px}
 .numSmall{width:90px}
-
-/* === เพิ่มเติม: Fullscreen ให้กึ่งกลางทั้งจอ + พื้นหลังเหมือนหน้าหลัก === */
-.fs-mode .stage{
-  min-height:100dvh;
-  width:100vw;
-  display:grid;
-  place-items:center;
-  align-content:center;
-  padding:0;
-  margin:0;
-  background:
-    radial-gradient(circle at 50% 40%, rgba(255,255,255,.07), rgba(255,255,255,0) 36%),
-    repeating-conic-gradient(from 0deg, rgba(255,255,255,.08) 0 10deg, rgba(0,0,0,0) 10deg 20deg),
-    radial-gradient(circle at 50% 40%, var(--bg1) 0%, #8d0606 60%, var(--bg2) 100%);
-  background-blend-mode: screen, soft-light, normal;
-}
-
-.fs-mode #digitsRow{ margin:0 auto; gap:clamp(10px,2.5vw,28px); }
-.fs-mode #fsPrizeView{ margin-top:1rem; text-align:center; }
