@@ -190,26 +190,63 @@
 
     // Register rendering/search
     let searchQuery='';
-    function renderReg(){const tb=$('regTable');tb.innerHTML=''; const data=state.participants.filter(p=>!searchQuery||p.name.toLowerCase().includes(searchQuery)||p.num.includes(searchQuery)); $('countAll').textContent=state.participants.length; data.forEach((p,i)=>{const tr=document.createElement('tr');tr.innerHTML=`<td class='p-2'>${p.num}</td><td class='p-2'>${p.name||'-'}</td><td class='p-2 text-center'><button data-num='${p.num}' class='text-xs bg-white/20 px-2 py-1 rounded'>ลบ</button></td>`;tb.appendChild(tr);});tb.querySelectorAll('button[data-num]').forEach(b=>b.onclick=e=>{const num=e.target.dataset.num;const idx=state.participants.findIndex(x=>x.num===num); if(idx>-1){state.participants.splice(idx,1); save(); renderReg();}});}
+    function renderReg(){
+      const tb=$('regTable'); tb.innerHTML='';
+      const data=state.participants.filter(p=>!searchQuery||p.name.toLowerCase().includes(searchQuery)||p.num.includes(searchQuery));
+      $('countAll').textContent=state.participants.length;
+      data.forEach((p)=>{
+        const tr=document.createElement('tr');
+        tr.innerHTML=\`<td class='p-2'>\${p.num}</td><td class='p-2'>\${p.name||'-'}</td><td class='p-2 text-center'><button data-num='\${p.num}' class='text-xs bg-white/20 px-2 py-1 rounded'>ลบ</button></td>\`;
+        tb.appendChild(tr);
+      });
+      tb.querySelectorAll('button[data-num]').forEach(b=>b.onclick=e=>{
+        const num=e.target.dataset.num; const idx=state.participants.findIndex(x=>x.num===num);
+        if(idx>-1){ state.participants.splice(idx,1); save(); renderReg(); }
+      });
+    }
     $('searchBox').addEventListener('input',e=>{searchQuery=(e.target.value||'').trim().toLowerCase(); renderReg();});
 
     const genUniqueNumber=()=>{let tries=0;while(tries++<800){const n=String(Math.floor(Math.random()*1e6)).padStart(6,'0');if(!state.participants.some(p=>p.num===n))return n;}return String(Date.now()%1e6).padStart(6,'0')};
     $('regNumber').addEventListener('input',e=>e.target.value=pad6(e.target.value));
-    $('btnAdd').onclick=()=>{const num=pad6($('regNumber').value),name=$('regName').value.trim();if(!num){$('regNumber').focus();return}if(state.participants.some(p=>p.num===num)){alert('หมายเลขนี้ถูกใช้แล้ว');return}state.participants.push({num,name});$('regNumber').value='';$('regName').value='';save();renderReg();showNamesTab('list')};
+    $('btnAdd').onclick=()=>{
+      const num=pad6($('regNumber').value),name=$('regName').value.trim();
+      if(!num){$('regNumber').focus();return}
+      if(state.participants.some(p=>p.num===num)){alert('หมายเลขนี้ถูกใช้แล้ว');return}
+      state.participants.push({num,name}); $('regNumber').value=''; $('regName').value=''; save(); renderReg(); showNamesTab('list');
+    };
 
     // Import/Export/clear participants
     $('btnImport').onclick=()=>$('fileImport').click();
     $('fileImport').addEventListener('change',async e=>{const f=e.target.files[0]; if(!f) return; const txt=await f.text(); importParticipants(txt); e.target.value='';});
-    function importParticipants(text){const used=new Set(state.participants.map(p=>p.num)); const lines=text.split(/
-?
-/).map(x=>x.trim()).filter(Boolean); let added=0; for(const line of lines){const [a,b] = line.split(','); const num=pad6(a||''); if(!num) continue; if(used.has(num)) continue; used.add(num); state.participants.push({num,name:(b||'').trim()}); added++;} save(); renderReg(); alert(`นำเข้าเรียบร้อย: ${added} ราย`);}
-    $('btnExport').onclick=()=>{const rows=[["number","name"],...state.participants.map(p=>[p.num,p.name])]; const csv=rows.map(r=>r.map(x=>`"${String(x).replaceAll('"','""')}"`).join(',')).join('
-'); const url=URL.createObjectURL(new Blob([csv],{type:'text/csv'})); const a=document.createElement('a'); a.href=url; a.download='participants.csv'; a.click(); URL.revokeObjectURL(url);};
+    function importParticipants(text){
+      const used=new Set(state.participants.map(p=>p.num));
+      const lines=text.split(/\\r?\\n/).map(x=>x.trim()).filter(Boolean); let added=0;
+      for(const line of lines){
+        const [a,b] = line.split(',');
+        const num=pad6(a||'');
+        if(!num) continue;
+        if(used.has(num)) continue;
+        used.add(num);
+        state.participants.push({num,name:(b||'').trim()});
+        added++;
+      }
+      save(); renderReg(); alert(\`นำเข้าเรียบร้อย: \${added} ราย\`);
+    }
+    $('btnExport').onclick=()=>{
+      const rows=[["number","name"],...state.participants.map(p=>[p.num,p.name])];
+      const csv=rows.map(r=>r.map(x=>'"'+String(x).replace(/"/g,'""')+'"').join(',')).join('\\n');
+      const url=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+      const a=document.createElement('a'); a.href=url; a.download='participants.csv'; a.click(); URL.revokeObjectURL(url);
+    };
     $('btnClearAll').onclick=()=>{if(confirm('ล้างรายชื่อทั้งหมด?')){state.participants=[]; save(); renderReg();}};
 
     // Export winners
-    $('btnExportWinners').onclick=()=>{const rows=[["number","name","prize","timestamp"],...state.winners.map(w=>[w.num,w.name,w.prize,w.ts])]; const csv=rows.map(r=>r.map(x=>`"${String(x).replaceAll('"','""')}"`).join(',')).join('
-'); const url=URL.createObjectURL(new Blob([csv],{type:'text/csv'})); const a=document.createElement('a'); a.href=url; a.download='winners.csv'; a.click(); URL.revokeObjectURL(url);};
+    $('btnExportWinners').onclick=()=>{
+      const rows=[["number","name","prize","timestamp"],...state.winners.map(w=>[w.num,w.name,w.prize,w.ts])];
+      const csv=rows.map(r=>r.map(x=>'"'+String(x).replace(/"/g,'""')+'"').join(',')).join('\\n');
+      const url=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+      const a=document.createElement('a'); a.href=url; a.download='winners.csv'; a.click(); URL.revokeObjectURL(url);
+    };
 
     // Dummy seed (only first time)
     const dummyNames=['David Wilson','Jane Smith','John Doe','Michael Johnson','Sarah Brown','Emily Davis','Chris Miller','Olivia Taylor','Daniel Anderson','Sophia Thomas','บินเดช มั่นคง','ปณิชา เก่งนัก','วิไล สวยใส','สมชาย ใจดี','สมหญิง ใจงาม','กิตติศักดิ์ พลังดี','พิมพ์ชนก ศรีสุข','อธิชา อนันต์ชัย','ชาญชัย ใจกล้า','วรรณิภา พรหมสุข'];
