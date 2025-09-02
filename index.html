@@ -3,35 +3,46 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Lucky Draw – 6 Digits (Production)</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <title>Lucky Draw – Standalone (No CDN)</title>
   <style>
-    :root{--gold:#ffd166;--bg1:#b2070b;--bg2:#6c0404}
-    html,body{height:100%;margin:0}
-    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:#fff;min-height:100vh;display:flex;flex-direction:column;
+    :root{--gold:#ffd166;--bg1:#b2070b;--bg2:#6c0404;--text:#111827}
+    *{box-sizing:border-box} html,body{height:100%} body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,'Noto Sans Thai',sans-serif;color:#fff;
       background:
         radial-gradient(circle at 50% 40%, rgba(255,255,255,.07), rgba(255,255,255,0) 36%),
         repeating-conic-gradient(from 0deg, rgba(255,255,255,.08) 0 10deg, rgba(0,0,0,0) 10deg 20deg),
         radial-gradient(circle at 50% 40%, var(--bg1) 0%, #8d0606 60%, var(--bg2) 100%);
-      background-blend-mode: screen, soft-light, normal}
-    .title{background:#fff;color:#111827;border-radius:14px;box-shadow:0 6px 16px rgba(0,0,0,.2)}
-    .digit{width:clamp(60px,9vw,110px);height:clamp(86px,14vw,140px);background:#fff;color:#111827;border-radius:16px;display:grid;place-items:center;font-weight:900;font-size:clamp(36px,7vw,80px);box-shadow:0 10px 22px rgba(0,0,0,.25), inset 0 -4px 0 #f2f2f2;border:4px solid #f6e1a2}
+      background-blend-mode: screen, soft-light, normal; min-height:100vh; display:flex; flex-direction:column}
+    header{display:flex;gap:.75rem;align-items:center;justify-content:space-between;padding:1rem 1.25rem}
+    .title{background:#fff;color:var(--text);padding:.5rem 1rem;border-radius:14px;font-weight:900;box-shadow:0 6px 16px rgba(0,0,0,.2)}
+    .nav{display:flex;gap:.5rem;flex-wrap:wrap}
+    button{cursor:pointer;border-radius:10px;border:1px solid transparent;padding:.6rem 1rem;font-weight:700}
+    .btn-primary{background:#fff;color:#7a0303}
+    .btn-ghost{background:transparent;border-color:#ffffff40;color:#fff}
+    .btn{transition:transform .06s ease, box-shadow .2s} .btn:active{transform:translateY(1px)}
+    main{flex:1;padding:0 1.25rem 2rem}
+    .center{display:grid;place-items:center}
+    .stack{display:grid;gap:1rem}
+    .digits{display:flex;justify-content:center;gap:min(2vw,18px);flex-wrap:wrap}
+    .digit{width:clamp(60px,9vw,110px);height:clamp(86px,14vw,140px);background:#fff;color:var(--text);border-radius:16px;display:grid;place-items:center;font-weight:900;font-size:clamp(36px,7vw,80px);box-shadow:0 10px 22px rgba(0,0,0,.25), inset 0 -4px 0 #f2f2f2;border:4px solid #f6e1a2}
     .digit.locked{outline:3px solid var(--gold);box-shadow:0 0 0 3px rgba(255,209,102,.35),0 10px 22px rgba(0,0,0,.25)}
-    .btn{transition:transform .06s ease, box-shadow .2s}.btn:active{transform:translateY(1px)}
-    .btn-primary{background:#fff;color:#7a0303;font-weight:800}
-    .btn-ghost{background:transparent;border:1px solid #ffffff40}
+    .row{display:flex;gap:.5rem;align-items:center;justify-content:center;flex-wrap:wrap}
+    select,input,textarea{padding:.55rem .75rem;border-radius:10px;border:1px solid #e5e7eb;color:var(--text)}
+    .panel{background:rgba(255,255,255,.1);border-radius:16px;padding:1rem}
+    table{width:100%;border-collapse:collapse;overflow:hidden;border-radius:12px}
+    thead th{background:rgba(255,255,255,.2);text-align:left;padding:.5rem}
+    tbody td{padding:.5rem;border-top:1px solid rgba(255,255,255,.15)}
+    .muted{opacity:.85}
+    .hidden{display:none !important}
+    /* modal */
     .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;z-index:50}
     .modal-bg.show{display:flex}
-    .modal{background:#7a0202;color:#fff;width:min(92vw,900px);border-radius:16px}
+    .modal{background:#7a0202;color:#fff;width:min(92vw,900px);border-radius:16px;padding:1rem}
     .list{max-height:45vh;overflow:auto}
-    select,input,textarea{color:#111827}
-    /* Fullscreen cleanup */
+    /* fullscreen */
     .fs-mode .hide-in-fs{display:none !important}
     .fs-mode .show-in-fs{display:block !important}
     .show-in-fs{display:none}
-    .show-inline{display:inline}
     .fs-mode main{padding:0}
-    .fs-mode #drawStage{max-width:min(1600px,96vw);gap:clamp(8px,2vw,24px)}
     .fs-mode #digitsRow{gap:clamp(10px,2.5vw,28px)}
     .fs-mode .digit{width:clamp(110px,14vw,220px);height:clamp(150px,20vw,260px);font-size:clamp(72px,12vw,180px);border-width:6px}
     .fs-mode #fsPrizeRemain{display:none}
@@ -39,93 +50,79 @@
   </style>
 </head>
 <body>
-  <header class="px-4 sm:px-8 py-4 flex items-center justify-between gap-3 hide-in-fs">
-    <div class="title px-4 py-1 text-2xl font-extrabold">Lucky Draw</div>
-    <nav class="flex gap-2">
-      <button id="tabRegister" class="px-3 py-2 rounded-md bg-white/10">รายชื่อ</button>
-      <button id="tabDraw" class="px-3 py-2 rounded-md bg-[color:var(--gold)] text-black font-semibold">สุ่มแสดงผล</button>
-      <button id="btnFullscreen" class="px-3 py-2 rounded-md btn-ghost">เต็มจอ ⤢</button>
-    </nav>
+  <header class="hide-in-fs">
+    <div class="title">Lucky Draw</div>
+    <div class="nav">
+      <button id="tabRegister" class="btn btn-ghost">รายชื่อ</button>
+      <button id="tabDraw" class="btn btn-primary">สุ่มแสดงผล</button>
+      <button id="btnFullscreen" class="btn btn-ghost">เต็มจอ ⤢</button>
+    </div>
   </header>
 
-  <main class="flex-1 px-4 sm:px-8 pb-10">
-    <!-- DRAW (stage) -->
-    <section id="panelDraw" class="grid place-items-center">
-      <div id="drawStage" class="w-full max-w-6xl grid gap-5 text-center">
-        <div id="digitsRow" class="flex justify-center gap-3 sm:gap-5 flex-wrap">
-          <div class="digit" id="d0">0</div>
-          <div class="digit" id="d1">0</div>
-          <div class="digit" id="d2">0</div>
-          <div class="digit" id="d3">0</div>
-          <div class="digit" id="d4">0</div>
-          <div class="digit" id="d5">0</div>
+  <main>
+    <!-- DRAW -->
+    <section id="panelDraw" class="center">
+      <div id="drawStage" class="stack" style="max-width:1100px;width:100%">
+        <div id="digitsRow" class="digits">
+          <div class="digit" id="d0">0</div><div class="digit" id="d1">0</div><div class="digit" id="d2">0</div>
+          <div class="digit" id="d3">0</div><div class="digit" id="d4">0</div><div class="digit" id="d5">0</div>
         </div>
 
-        <!-- Prize selector (normal) -->
-        <div class="hide-in-fs flex flex-wrap justify-center items-center gap-3">
-          <div class="text-base sm:text-lg">รางวัลปัจจุบัน:</div>
-          <select id="quickPrize" class="rounded px-3 py-2 min-w-[300px] bg-white text-black font-semibold"></select>
-          <div class="text-sm opacity-90">คงเหลือ: <span id="quickRemain">-</span></div>
+        <div class="row hide-in-fs">
+          <div>รางวัลปัจจุบัน:</div>
+          <select id="quickPrize" style="min-width:280px;background:#fff;font-weight:700"></select>
+          <div class="muted">คงเหลือ: <span id="quickRemain">-</span></div>
         </div>
-        <!-- Prize view (fullscreen) -->
-        <div id="fsPrizeView" class="show-in-fs text-xl sm:text-2xl font-semibold">รางวัล: <span id="fsPrizeName" class="text-[color:var(--gold)]"></span> <span id="fsPrizeRemain" class="opacity-90 text-base"></span></div>
-
-        <div id="drawNumberLine" class="hide-in-fs text-lg sm:text-2xl">หมายเลขที่สุ่มได้: <span id="drawNumber" class="text-[color:var(--gold)] font-extrabold">000000</span></div>
-
-        <div class="hide-in-fs flex flex-wrap justify-center gap-3">
-          <button id="btnStart" class="btn btn-primary px-6 py-3 rounded-lg text-lg">🎰 เริ่มสุ่ม</button>
-          <button id="btnManagePrize" class="btn btn-ghost px-6 py-3 rounded-lg">จัดการรางวัล</button>
-          <button id="btnResetWinners" class="btn btn-ghost px-6 py-3 rounded-lg">รีเซ็ตผู้ชนะ</button>
-          <button id="btnExportWinners" class="btn btn-ghost px-6 py-3 rounded-lg">Export ผู้ชนะ CSV</button>
+        <div id="fsPrizeView" class="show-in-fs" style="text-align:center;font-size:1.25rem;font-weight:700">
+          รางวัล: <span id="fsPrizeName" style="color:var(--gold)"></span> <span id="fsPrizeRemain" class="muted" style="font-size:.95rem"></span>
         </div>
 
-        <div class="hide-in-fs w-full max-w-4xl mt-2">
-          <h3 class="font-bold mb-2">ผู้ชนะ</h3>
-          <ol id="winnerList" class="grid gap-2 text-sm list"></ol>
+        <div id="drawNumberLine" class="hide-in-fs" style="text-align:center;font-size:1.25rem">หมายเลขที่สุ่มได้: <span id="drawNumber" style="color:var(--gold);font-weight:900">000000</span></div>
+
+        <div class="row hide-in-fs">
+          <button id="btnStart" class="btn btn-primary">🎰 เริ่มสุ่ม</button>
+          <button id="btnManagePrize" class="btn btn-ghost">จัดการรางวัล</button>
+          <button id="btnResetWinners" class="btn btn-ghost">รีเซ็ตผู้ชนะ</button>
+          <button id="btnExportWinners" class="btn btn-ghost">Export ผู้ชนะ CSV</button>
+        </div>
+
+        <div class="hide-in-fs panel" style="max-width:900px;margin:0 auto">
+          <h3 style="margin:0 0 .5rem 0">ผู้ชนะ</h3>
+          <ol id="winnerList" class="list" style="display:grid;gap:.5rem"></ol>
         </div>
       </div>
     </section>
 
-    <!-- REGISTER (Names) -->
+    <!-- REGISTER -->
     <section id="panelRegister" class="hidden">
-      <div class="w-full max-w-6xl mx-auto grid gap-4">
-        <div class="bg-white/10 p-4 rounded-xl">
-          <div class="flex gap-2 mb-3">
-            <button id="tabNamesList" class="px-3 py-2 rounded bg-white/20 font-semibold">รายชื่อ</button>
-            <button id="tabNamesAdd" class="px-3 py-2 rounded bg-white/10">เพิ่มรายชื่อ</button>
+      <div class="panel" style="max-width:1100px;margin:0 auto;display:grid;gap:1rem">
+        <div style="display:flex;gap:.5rem">
+          <button id="tabNamesList" class="btn btn-primary">รายชื่อ</button>
+          <button id="tabNamesAdd" class="btn btn-ghost">เพิ่มรายชื่อ</button>
+        </div>
+        <div id="namesAdd" class="hidden" style="display:grid;gap:.8rem">
+          <div style="display:grid;grid-template-columns:160px 1fr auto;gap:.6rem;align-items:center">
+            <input id="regNumber" maxlength="6" placeholder="000000" />
+            <input id="regName" placeholder="ชื่อผู้ร่วมลุ้น" />
+            <button id="btnAdd" class="btn" style="background:var(--gold);color:#111;font-weight:700">เพิ่ม</button>
           </div>
-          <!-- Add -->
-          <div id="namesAdd" class="hidden grid gap-3">
-            <div class="grid sm:grid-cols-[160px_1fr_auto] gap-2 items-center">
-              <input id="regNumber" maxlength="6" placeholder="000000" class="rounded px-3 py-2 text-black w-[140px]" />
-              <input id="regName" placeholder="ชื่อผู้ร่วมลุ้น" class="rounded px-3 py-2 text-black" />
-              <button id="btnAdd" class="btn px-4 py-2 rounded bg-[color:var(--gold)] text-black font-semibold">เพิ่ม</button>
-            </div>
-            <div class="flex flex-wrap items-center gap-2">
-              <input type="file" id="fileImport" accept=".csv,.txt" class="hidden" />
-              <button id="btnImport" class="btn btn-ghost px-3 py-2 rounded">นำเข้าจากไฟล์</button>
-              <button id="btnExport" class="btn btn-ghost px-3 py-2 rounded">Export รายชื่อ CSV</button>
-              <button id="btnClearAll" class="btn btn-ghost px-3 py-2 rounded">ล้างรายชื่อทั้งหมด</button>
-            </div>
-            <p class="text-xs opacity-80">ไฟล์นำเข้า: บรรทัดละ <span class="show-inline">เลข,ชื่อ</span> หรือ <span class="show-inline">เลข</span> อย่างเดียวก็ได้</p>
+          <div style="display:flex;gap:.5rem;flex-wrap:wrap;align-items:center">
+            <input type="file" id="fileImport" accept=".csv,.txt" class="hidden" />
+            <button id="btnImport" class="btn btn-ghost">นำเข้าจากไฟล์</button>
+            <button id="btnExport" class="btn btn-ghost">Export รายชื่อ CSV</button>
+            <button id="btnClearAll" class="btn btn-ghost">ล้างรายชื่อทั้งหมด</button>
           </div>
-          <!-- List -->
-          <div id="namesList" class="grid gap-2">
-            <div class="flex items-center justify-between gap-2">
-              <input id="searchBox" placeholder="ค้นหาชื่อหรือเลข" class="rounded px-3 py-2 text-black w-full max-w-sm" />
-              <span class="text-sm opacity-80">ทั้งหมด: <b id="countAll">0</b> ราย</span>
-            </div>
-            <table class="w-full text-sm bg-white/10 rounded-xl overflow-hidden">
-              <thead class="bg-white/20">
-                <tr>
-                  <th class="text-left p-2">หมายเลข</th>
-                  <th class="text-left p-2">ชื่อ</th>
-                  <th class="p-2">ลบ</th>
-                </tr>
-              </thead>
-              <tbody id="regTable"></tbody>
-            </table>
+          <p class="muted" style="font-size:.9rem">ไฟล์นำเข้า: ต่อบรรทัดเป็น <b>เลข,ชื่อ</b> หรือ <b>เลข</b> อย่างเดียว</p>
+        </div>
+        <div id="namesList" class="stack">
+          <div style="display:flex;gap:.5rem;align-items:center;justify-content:space-between;flex-wrap:wrap">
+            <input id="searchBox" placeholder="ค้นหาชื่อหรือเลข" style="max-width:360px;width:100%"/>
+            <span class="muted">ทั้งหมด: <b id="countAll">0</b> ราย</span>
           </div>
+          <table>
+            <thead><tr><th>หมายเลข</th><th>ชื่อ</th><th style="text-align:center">ลบ</th></tr></thead>
+            <tbody id="regTable"></tbody>
+          </table>
         </div>
       </div>
     </section>
@@ -133,59 +130,56 @@
 
   <!-- RESULT MODAL -->
   <div id="resultModal" class="modal-bg">
-    <div class="modal p-6">
-      <h3 class="text-xl font-bold">ผลการสุ่ม</h3>
-      <p class="mt-3">หมายเลขที่ออก: <span id="resNumber" class="text-[color:var(--gold)] font-extrabold text-xl">000000</span></p>
-      <div id="resFound" class="mt-2 hidden">
-        <p>ผู้ชนะ: <span id="resName" class="font-bold"></span></p>
-        <p class="text-sm mt-1">รางวัล: <span id="resPrize" class="font-semibold"></span></p>
+    <div class="modal">
+      <h3 style="margin:0;font-size:1.1rem;font-weight:800">ผลการสุ่ม</h3>
+      <p class="muted">หมายเลขที่ออก: <span id="resNumber" style="color:var(--gold);font-weight:900">000000</span></p>
+      <div id="resFound" class="hidden">
+        <p>ผู้ชนะ: <span id="resName" style="font-weight:800"></span></p>
+        <p class="muted">รางวัล: <span id="resPrize" style="font-weight:700"></span></p>
       </div>
-      <div id="resEmpty" class="mt-2 hidden"><p>ยังไม่มีผู้ลงทะเบียน</p></div>
-      <div class="flex justify-end gap-2 mt-6">
-        <button id="btnClose" class="px-4 py-2 rounded bg-transparent border border-white/30">ปิด</button>
-        <button id="btnConfirmWin" class="px-4 py-2 rounded bg-[color:var(--gold)] text-black font-semibold hidden">บันทึกผู้ชนะ</button>
+      <div id="resEmpty" class="hidden"><p>ยังไม่มีผู้ลงทะเบียน</p></div>
+      <div class="row" style="justify-content:flex-end;margin-top:1rem">
+        <button id="btnClose" class="btn btn-ghost">ปิด</button>
+        <button id="btnConfirmWin" class="btn" style="background:var(--gold);color:#111;font-weight:700">บันทึกผู้ชนะ</button>
       </div>
     </div>
   </div>
 
   <!-- PRIZE MODAL -->
   <div id="prizeModal" class="modal-bg">
-    <div class="modal p-6">
-      <h3 class="text-xl font-bold">จัดการรางวัล</h3>
-      <div id="prizeRows" class="grid gap-2 mt-3"></div>
-      <div class="flex gap-2 mt-3">
-        <input id="newPrizeName" class="rounded px-3 py-2 text-black flex-1" placeholder="ชื่อรางวัลใหม่" />
-        <input id="newPrizeQty" type="number" min="1" value="1" class="rounded px-3 py-2 text-black w-24" />
-        <button id="addPrize" class="btn px-4 py-2 rounded bg-[color:var(--gold)] text-black font-semibold">เพิ่ม</button>
+    <div class="modal">
+      <h3 style="margin:0;font-size:1.1rem;font-weight:800">จัดการรางวัล</h3>
+      <div id="prizeRows" class="stack" style="margin-top:.8rem"></div>
+      <div style="display:flex;gap:.5rem;margin-top:.5rem;flex-wrap:wrap">
+        <input id="newPrizeName" placeholder="ชื่อรางวัลใหม่" style="flex:1;min-width:220px"/>
+        <input id="newPrizeQty" type="number" min="1" value="1" style="width:90px"/>
+        <button id="addPrize" class="btn" style="background:var(--gold);color:#111;font-weight:700">เพิ่ม</button>
       </div>
-      <div class="flex justify-end gap-2 mt-6">
-        <button id="closePrize" class="px-4 py-2 rounded bg-transparent border border-white/30">ปิด</button>
-        <button id="savePrize" class="px-4 py-2 rounded bg-[color:var(--gold)] text-black font-semibold">บันทึก</button>
+      <div class="row" style="justify-content:flex-end;margin-top:1rem">
+        <button id="closePrize" class="btn btn-ghost">ปิด</button>
+        <button id="savePrize" class="btn" style="background:var(--gold);color:#111;font-weight:700">บันทึก</button>
       </div>
     </div>
   </div>
 
   <script>
     // === State ===
-    const SKEY='ldraw-6digits-prod.v1';
-    const state={
-      participants:[],
-      winners:[],
-      shuffleMs:1200,
-      prizes:[{name:'รางวัลทั่วไป',qty:1,active:true}]
-    };
+    const SKEY='ldraw-6digits-standalone.v1';
+    const state={participants:[], winners:[], shuffleMs:1200, prizes:[{name:'รางวัลทั่วไป',qty:1,active:true}]};
     try{Object.assign(state,JSON.parse(localStorage.getItem(SKEY)||'{}'))}catch{}
     const $=id=>document.getElementById(id);
     const onlyDigits=s=>{let out='';const str=String(s);for(let i=0;i<str.length;i++){const c=str[i];if(c>='0'&&c<='9') out+=c;}return out};
     const pad6=n=>onlyDigits(n).padStart(6,'0').slice(-6);
     const save=()=>localStorage.setItem(SKEY,JSON.stringify(state));
 
-    // Tabs (header)
-    const show=p=>{ $('panelDraw').classList.toggle('hidden',p!=='draw'); $('panelRegister').classList.toggle('hidden',p!=='register'); $('tabDraw').classList.toggle('bg-[color:var(--gold)]',p==='draw'); $('tabDraw').classList.toggle('text-black',p==='draw'); $('tabRegister').classList.toggle('bg-[color:var(--gold)]',p==='register'); $('tabRegister').classList.toggle('text-black',p==='register'); };
+    // Tabs
+    const show=p=>{ $('panelDraw').classList.toggle('hidden',p!=='draw'); $('panelRegister').classList.toggle('hidden',p!=='register');
+      $('tabDraw').classList.toggle('btn-primary',p==='draw'); $('tabRegister').classList.toggle('btn-primary',p==='register');
+      $('tabDraw').classList.toggle('btn-ghost',p!=='draw'); $('tabRegister').classList.toggle('btn-ghost',p!=='register'); };
     $('tabDraw').onclick=()=>show('draw'); $('tabRegister').onclick=()=>show('register');
 
     // Names sub-tabs
-    function showNamesTab(k){ const add=$('namesAdd'), list=$('namesList'); const b1=$('tabNamesList'), b2=$('tabNamesAdd'); if(k==='add'){ add.classList.remove('hidden'); list.classList.add('hidden'); b2.classList.add('bg-white/20','font-semibold'); b1.classList.remove('bg-white/20','font-semibold'); } else { list.classList.remove('hidden'); add.classList.add('hidden'); b1.classList.add('bg-white/20','font-semibold'); b2.classList.remove('bg-white/20','font-semibold'); } }
+    function showNamesTab(k){ const add=$('namesAdd'), list=$('namesList'); if(k==='add'){ add.classList.remove('hidden'); list.classList.add('hidden'); $('tabNamesAdd').classList.add('btn-primary'); $('tabNamesAdd').classList.remove('btn-ghost'); $('tabNamesList').classList.add('btn-ghost'); $('tabNamesList').classList.remove('btn-primary'); } else { list.classList.remove('hidden'); add.classList.add('hidden'); $('tabNamesList').classList.add('btn-primary'); $('tabNamesList').classList.remove('btn-ghost'); $('tabNamesAdd').classList.add('btn-ghost'); $('tabNamesAdd').classList.remove('btn-primary'); } }
     $('tabNamesList').onclick=()=>showNamesTab('list'); $('tabNamesAdd').onclick=()=>showNamesTab('add');
 
     // Register rendering/search
@@ -196,7 +190,7 @@
       $('countAll').textContent=state.participants.length;
       data.forEach((p)=>{
         const tr=document.createElement('tr');
-        tr.innerHTML=\`<td class='p-2'>\${p.num}</td><td class='p-2'>\${p.name||'-'}</td><td class='p-2 text-center'><button data-num='\${p.num}' class='text-xs bg-white/20 px-2 py-1 rounded'>ลบ</button></td>\`;
+        tr.innerHTML=`<td>${p.num}</td><td>${p.name||'-'}</td><td style="text-align:center"><button data-num="${p.num}" class="btn btn-ghost" style="padding:.25rem .5rem">ลบ</button></td>`;
         tb.appendChild(tr);
       });
       tb.querySelectorAll('button[data-num]').forEach(b=>b.onclick=e=>{
@@ -222,15 +216,14 @@
       const used=new Set(state.participants.map(p=>p.num));
       const lines=text.split(/\\r?\\n/).map(x=>x.trim()).filter(Boolean); let added=0;
       for(const line of lines){
-        const [a,b] = line.split(',');
-        const num=pad6(a||'');
-        if(!num) continue;
-        if(used.has(num)) continue;
+        const parts=line.split(',');
+        const num=pad6(parts[0]||'');
+        if(!num||used.has(num)) continue;
         used.add(num);
-        state.participants.push({num,name:(b||'').trim()});
+        state.participants.push({num,name:(parts[1]||'').trim()});
         added++;
       }
-      save(); renderReg(); alert(\`นำเข้าเรียบร้อย: \${added} ราย\`);
+      save(); renderReg(); alert(`นำเข้าเรียบร้อย: ${added} ราย`);
     }
     $('btnExport').onclick=()=>{
       const rows=[["number","name"],...state.participants.map(p=>[p.num,p.name])];
@@ -260,10 +253,10 @@
     function buildQuickPrize(){ const sel=$('quickPrize'); sel.innerHTML=''; state.prizes.forEach((p,i)=>{ const opt=document.createElement('option'); opt.value=i; opt.textContent=`${p.name} (คงเหลือ ${remain(p)}/${p.qty})`; if(p.active) opt.selected=true; sel.appendChild(opt); }); sel.onchange=()=>{ const i=parseInt(sel.value); state.prizes.forEach((p,idx)=>p.active=(idx===i)); save(); updatePrizeViews(); buildQuickPrize(); }; }
 
     // Digits utils
-    function setDigits(s){for(let i=0;i<6;i++){$('d'+i).textContent=s[i]||'0';}$('drawNumber').textContent=s}
-    function readDigits(){let s='';for(let i=0;i<6;i++){s+=($('d'+i).textContent||'0');}return s}
-    function pool(){const taken=new Set(state.winners.map(w=>w.num));return state.participants.filter(p=>!taken.has(p.num))}
-    function clearLocks(){for(let i=0;i<6;i++)$('d'+i).classList.remove('locked')}
+    function setDigits(s){for(let i=0;i<6;i++){ $('d'+i).textContent=s[i]||'0'; } $('drawNumber').textContent=s }
+    function readDigits(){let s=''; for(let i=0;i<6;i++){ s+=($('d'+i).textContent||'0'); } return s }
+    function pool(){const taken=new Set(state.winners.map(w=>w.num)); return state.participants.filter(p=>!taken.has(p.num)) }
+    function clearLocks(){ for(let i=0;i<6;i++) $('d'+i).classList.remove('locked') }
     function revealTo(target, done){ let i=0; const lockNext=()=>{ if(i>=6){ done&&done(); return; } const box=$('d'+i); const final=target[i]; let t0=performance.now(); const dur=300; const tick=(now)=>{ if(now-t0>=dur){ box.textContent=final; box.classList.add('locked'); $('drawNumber').textContent=readDigits(); i++; setTimeout(lockNext,100); return; } box.textContent=String(Math.floor(Math.random()*10)); $('drawNumber').textContent=readDigits(); requestAnimationFrame(tick); }; requestAnimationFrame(tick); }; lockNext(); }
 
     // Draw
@@ -273,26 +266,33 @@
       const ap=activePrize(); if(!ap){ alert('ยังไม่มีรางวัล'); return; }
       if(remain(ap)<=0){ alert('รางวัลนี้หมดแล้ว กรุณาเปลี่ยนรางวัล'); return; }
       const pick=p[Math.floor(Math.random()*p.length)]; final=pick.num; person=pick; clearLocks();
-      const start=performance.now(); const spinStep=(now)=>{ if(now-start>=state.shuffleMs){ cancelAnimationFrame(raf); revealTo(final, ()=>{ 
-          const isFS = document.body.classList.contains('fs-mode');
-          if(isFS){
-            const ts=new Date().toLocaleString('th-TH',{hour12:false});
-            state.winners.unshift({num:person.num,name:person.name,prize:ap.name,ts});
-            save(); paintWinners(); updatePrizeViews(); buildQuickPrize();
-          } else {
-            $('resNumber').textContent=final; 
-            $('resEmpty').classList.add('hidden'); 
-            $('resFound').classList.remove('hidden'); 
-            $('resName').textContent=(person.name||'-')+' ('+person.num+')'; 
-            $('resPrize').textContent=ap.name; 
-            $('btnConfirmWin').classList.remove('hidden'); 
-            $('resultModal').classList.add('show'); 
-          }
-        }); return; } if(((now-start)%80)<16){ setDigits(String(Math.floor(Math.random()*1e6)).padStart(6,'0')); } raf=requestAnimationFrame(spinStep); }; raf=requestAnimationFrame(spinStep); };
+      const start=performance.now();
+      const spinStep=(now)=>{
+        if(now-start>=state.shuffleMs){
+          cancelAnimationFrame(raf);
+          revealTo(final, ()=>{
+            const isFS = document.body.classList.contains('fs-mode');
+            if(isFS){
+              const ts=new Date().toLocaleString('th-TH',{hour12:false});
+              state.winners.unshift({num:person.num,name:person.name,prize:ap.name,ts});
+              save(); paintWinners(); updatePrizeViews(); buildQuickPrize();
+            }else{
+              $('resNumber').textContent=final; $('resEmpty').classList.add('hidden'); $('resFound').classList.remove('hidden');
+              $('resName').textContent=(person.name||'-')+' ('+person.num+')'; $('resPrize').textContent=ap.name;
+              $('btnConfirmWin').classList.remove('hidden'); $('resultModal').classList.add('show');
+            }
+          });
+          return;
+        }
+        if(((now-start)%80)<16){ setDigits(String(Math.floor(Math.random()*1e6)).padStart(6,'0')); }
+        raf=requestAnimationFrame(spinStep);
+      };
+      raf=requestAnimationFrame(spinStep);
+    };
 
     // Winners
     $('btnConfirmWin').onclick=()=>{ const ap=activePrize(); const ts=new Date().toLocaleString('th-TH',{hour12:false}); state.winners.unshift({num:person.num,name:person.name,prize:ap.name,ts}); save(); paintWinners(); updatePrizeViews(); buildQuickPrize(); $('btnClose').click() };
-    function paintWinners(){ const box=$('winnerList'); box.innerHTML=''; state.winners.forEach(w=>{ const li=document.createElement('li'); li.className='bg-white/10 rounded p-2'; li.innerHTML=`<div class='font-semibold text-[color:var(--gold)]'>${w.num}</div><div class='text-xs'>${w.name||'-'} • ${w.prize||''} • ${w.ts}</div>`; box.appendChild(li); }); }
+    function paintWinners(){ const box=$('winnerList'); box.innerHTML=''; state.winners.forEach(w=>{ const li=document.createElement('li'); li.style.cssText='background:rgba(255,255,255,.1);border-radius:10px;padding:.5rem'; li.innerHTML=`<div style="color:var(--gold);font-weight:800">${w.num}</div><div class="muted" style="font-size:.85rem">${w.name||'-'} • ${w.prize||''} • ${w.ts}</div>`; box.appendChild(li); }); }
     $('btnResetWinners').onclick=()=>{ if(confirm('ล้างผู้ชนะทั้งหมด?')){ state.winners=[]; save(); paintWinners(); updatePrizeViews(); buildQuickPrize(); }};
 
     // Prize modal
@@ -300,7 +300,22 @@
     function openPrize(){ buildPrizeRows(); prizeModal.classList.add('show'); }
     function closePrize(){ prizeModal.classList.remove('show'); }
     $('btnManagePrize').onclick=openPrize; $('closePrize').onclick=closePrize; prizeModal.addEventListener('click',e=>{ if(e.target.id==='prizeModal') closePrize(); });
-    function buildPrizeRows(){ const wrap=$('prizeRows'); wrap.innerHTML=''; state.prizes.forEach((p,i)=>{ const row=document.createElement('div'); row.className='bg-white/10 rounded p-3 grid grid-cols-[1fr_auto_auto_auto_auto] gap-2 items-center'; row.innerHTML=`<input data-i='${i}' class='pName rounded px-2 py-1 text-black' value='${p.name}'> <span class='text-sm'>คงเหลือ: <b class='text-[color:var(--gold)]'>${remain(p)}</b> / ${p.qty}</span> <input data-i='${i}' type='number' min='1' class='pQty w-20 rounded px-2 py-1 text-black' value='${p.qty}'> <label class='text-sm flex items-center gap-1'><input data-i='${i}' type='radio' name='activePrize' ${p.active?'checked':''}> ใช้งาน</label> <button data-i='${i}' class='del btn px-3 py-1 rounded btn-ghost'>ลบ</button>`; wrap.appendChild(row); }); wrap.querySelectorAll('.pName').forEach(inp=>inp.oninput=e=>{const i=+e.target.dataset.i; state.prizes[i].name=e.target.value; save(); updatePrizeViews(); buildQuickPrize();}); wrap.querySelectorAll('.pQty').forEach(inp=>inp.oninput=e=>{const i=+e.target.dataset.i; state.prizes[i].qty=Math.max(1,parseInt(e.target.value||1)); save(); updatePrizeViews(); buildQuickPrize(); buildPrizeRows();}); wrap.querySelectorAll('input[name=activePrize]').forEach((r,idx)=> r.onchange=()=>{ state.prizes.forEach((p,j)=>p.active=(j===idx)); save(); updatePrizeViews(); buildQuickPrize();}); wrap.querySelectorAll('.del').forEach(btn=> btn.onclick=e=>{ const i=+e.target.dataset.i; if(state.prizes.length<=1){alert('ต้องมีอย่างน้อย 1 รางวัล'); return} state.prizes.splice(i,1); save(); updatePrizeViews(); buildQuickPrize(); buildPrizeRows(); }); }
+    function buildPrizeRows(){
+      const wrap=$('prizeRows'); wrap.innerHTML='';
+      state.prizes.forEach((p,i)=>{
+        const row=document.createElement('div'); row.className='panel'; row.style.padding='.6rem'; row.style.display='grid'; row.style.gridTemplateColumns='1fr auto auto auto auto'; row.style.gap='.5rem'; row.style.alignItems='center';
+        row.innerHTML=`<input data-i="${i}" class="pName" value="${p.name}">
+          <span class="muted" style="font-size:.9rem">คงเหลือ: <b style="color:var(--gold)">${remain(p)}</b> / ${p.qty}</span>
+          <input data-i="${i}" type="number" min="1" class="pQty" value="${p.qty}" style="width:80px">
+          <label class="muted" style="display:flex;gap:.35rem;align-items:center"><input data-i="${i}" type="radio" name="activePrize" ${p.active?'checked':''}> ใช้งาน</label>
+          <button data-i="${i}" class="del btn btn-ghost">ลบ</button>`;
+        wrap.appendChild(row);
+      });
+      wrap.querySelectorAll('.pName').forEach(inp=>inp.oninput=e=>{const i=+e.target.dataset.i; state.prizes[i].name=e.target.value; save(); updatePrizeViews(); buildQuickPrize();});
+      wrap.querySelectorAll('.pQty').forEach(inp=>inp.oninput=e=>{const i=+e.target.dataset.i; state.prizes[i].qty=Math.max(1,parseInt(e.target.value||1)); save(); updatePrizeViews(); buildQuickPrize(); buildPrizeRows();});
+      wrap.querySelectorAll('input[name=activePrize]').forEach((r,idx)=> r.onchange=()=>{ state.prizes.forEach((p,j)=>p.active=(j===idx)); save(); updatePrizeViews(); buildQuickPrize();});
+      wrap.querySelectorAll('.del').forEach(btn=> btn.onclick=e=>{ const i=+e.target.dataset.i; if(state.prizes.length<=1){alert('ต้องมีอย่างน้อย 1 รางวัล'); return} state.prizes.splice(i,1); save(); updatePrizeViews(); buildQuickPrize(); buildPrizeRows(); });
+    }
     $('addPrize').onclick=()=>{ const name=$('newPrizeName').value.trim(); const qty=Math.max(1,parseInt($('newPrizeQty').value||1)); if(!name){$('newPrizeName').focus(); return} state.prizes.push({name,qty,active:false}); $('newPrizeName').value=''; $('newPrizeQty').value=1; save(); buildPrizeRows(); buildQuickPrize(); updatePrizeViews(); };
     $('savePrize').onclick=()=>{ save(); closePrize(); };
 
@@ -317,7 +332,11 @@
     document.addEventListener('keydown',e=>{if(e.key==='f'||e.key==='F'){e.preventDefault();toggleFS();} if((e.key===' '||e.code==='Space')&&document.body.classList.contains('fs-mode')){e.preventDefault();$('btnStart').click();}});
 
     // Init
-    ensureDummy(); renderReg(); paintWinners(); setDigits('000000'); show('draw'); buildQuickPrize(); updatePrizeViews(); showNamesTab('list');
+    function safeInit(){ try{
+      ensureDummy(); renderReg(); paintWinners(); setDigits('000000'); show('draw'); buildQuickPrize(); updatePrizeViews(); showNamesTab('list');
+    }catch(err){ alert('เกิดข้อผิดพลาดในการเริ่มระบบ: '+err.message); console.error(err); } }
+    // Run after DOM is ready (this script is at bottom but be safe)
+    if(document.readyState === 'loading'){ document.addEventListener('DOMContentLoaded', safeInit); } else { safeInit(); }
   </script>
 </body>
 </html>
